@@ -10,6 +10,21 @@ read var1 var2 var3
 date=`date +%Y%m%d`
 homedir=`id $var1`
 
+###delete user id
+rst=`cat /etc/passwd | grep $var1`
+if [ "${rst}" = "" ]; then
+ echo "user doesn't exist. exit"
+ exit
+else
+# /usr/sbin/rmuser $var1
+/sbin/userdel $var1
+ echo "id $var1"
+ user_rst=`id $var1`
+ echo $user_rst
+fi
+
+###delete ML
+
 #array
 mailad=(`find /var/qmail/alias/ -type f -name ".qmail*" | xargs grep ${var2}`)
 disp_mailad=`find /var/qmail/alias/ -type f -name ".qmail*" | xargs grep ${var2}`
@@ -70,7 +85,7 @@ done
 # echo $diff_mlrst
 
 #delete user id
- /usr/sbin/rmuser $var1
- echo "id $var1"
- user_rst=`id $var1`
- echo $user_rst
+# /usr/sbin/rmuser $var1
+# echo "id $var1"
+# user_rst=`id $var1`
+# echo $user_rst
