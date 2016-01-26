@@ -24,21 +24,13 @@ printf "%s----------------------------------\n"
 #sanitize1
 for obj in "${mailad[@]}"; do
   obj2=($(printf "$obj" | sed -e "s/:.*//"))
-# if [[ ${obj} =~ \d{8} ]]; then
-# echo 'this is skip'
-#else
  obj3+=("$obj2")
-# fi
 done
-
-#echo -e ${obj3[@]}
 
 #sanitize2
 ptn='([0-9]{8})'
 for obj4 in "${obj3[@]}"; do
-# echo $obj4
  if [[ ! "${obj4[@]}" =~ $ptn ]]; then
-#  echo "tooru"
  delmail+=("$obj4")
 else
  unset obj4
@@ -51,37 +43,34 @@ printf "%s--------------------------------\n"
 
 #sanitize3
 for mlfile in "${delmail[@]}"; do
-# echo $mlfile
   mlfile_stz=($(printf ""$mlfile | sed -e "s/^\/var\/qmail\/alias\///"))
   mlfile_lst+=("$mlfile_stz")
-# echo -e ${mlfile_lst}
 done
 
 #copy-ml-file
 for mailfile in "${mlfile_lst[@]}"; do
- echo $mailfile
  cp -p /var/qmail/alias/$mailfile /backup/2016/$mailfile.$date.$var3
 done
 
 #mailing-list-delete
+#diff
 for mailfile in "${mlfile_lst[@]}"; do
- echo $mailfile
-#sed -e 's/^\$var2//g' /var/qmail/alias/$mailfile > /var/qmail/alias/$mailfile
- sed -i -e '/^$var2/d' /var/qmail/alias/$mailfile
+ sed -i -e "/^$var2/d" /var/qmail/alias/$mailfile
+ echo "diff /var/qmail/alias/$mailfile /backup/2016/$mailfile.$date.$var3"
+ diff_rst=`diff /var/qmail/alias/$mailfile /backup/2016/$mailfile.$date.$var3`
+ echo $diff_rst
 done
 
-#mailad2=`echo $mailad | egrep -v '[0-9]{8}'`
-#mailad2=`echo $mailad | awk 'match($0, [0-9]{8}`
-#mailad2=`awk '!/[0-9]{8}/' ${mailad}`
-# if [[ `echo $mailad | grep -v  [0-9]{8}` ]]; then
-#    mailad2 = $mailad
-# fi
-#for item in ${mailad}; do
-#if [[ $item != /[0-9]/ ]]; then
-#   rm ${item}
-#else
-#   mailad2=${item}
-# fi
-#echo $item
-#done
-#printf "%s$mailad2"
+#edit ezmlm
+# /usr/local/bin/ezmlm/ezmlm-list /var/qmail/ezmlm/dooga-ml > dooga-ml.$date.$var3
+#/usr/local/bin/ezmlm/ezmlm-unsub /var/qmail/ezmlm/dooga-ml $var2
+#/usr/local/bin/ezmlm/ezmlm-list /var/qmail/ezmlm/dooga-ml > dooga-ml.$date.$var3_2
+# echo "diff dooga-ml.$date.$var3 dooga-ml.$date.$var3_2"
+# diff_mlrst=`diff dooga-ml.$date.$var3 dooga-ml.$date.$var3_2`
+# echo $diff_mlrst
+
+#delete user id
+ /usr/sbin/rmuser $var1
+ echo "id $var1"
+ user_rst=`id $var1`
+ echo $user_rst
