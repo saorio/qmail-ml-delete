@@ -1,12 +1,12 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 ###############################################################################
 # qmail-ml-delete                                                             #
 #var1 = userid                                                                #
-#var2 = userid@example.com                                                    #
+#var2 = userid@mailaddress                                                    #
 #var3 = operator                                                              #
 ###############################################################################
 
-echo -n "Enter the values of variables 'var1' and 'var2' "
+echo -n "Enter the values of variables 'var1' and 'var2' 'var3'"
 echo -n "(separated by a space or tab): "
 read var1 var2 var3
 #echo "var1 = $var1      var2 = $var2"
@@ -35,7 +35,7 @@ if [ "${disp_mailad}" = "" ]; then
  exit
 else
 
- mailad=($(find /var/qmail/alias/ -type f -name ".qmail*" | xargs grep ${var2}))
+ mailad=(`find /var/qmail/alias/ -type f -name ".qmail*" | xargs grep ${var2}`)
  printf "%s -----------home directory--------\n"
  printf "%s$homedir\n"
  printf "%s ---------------------------------\n"
@@ -43,19 +43,19 @@ else
  printf "%s$disp_mailad\n"
  printf "%s----------------------------------\n"
 
- #sanitize1
+ #sanitize1 delete name@mailaddress
  for obj in "${mailad[@]}"; do
-  obj2=($(printf "$obj" | sed -e "s/:.*//"))
-   obj3=("$obj2")
+  obj2=(`printf "$obj" | sed -e "s/:.*//"`)
+   obj3+=("$obj2")
  done
 
- #sanitize2
+ #sanitize2 delete old copy MLfile
  ptn='([0-9]{8})'
  for obj4 in "${obj3[@]}"; do
   if [[ ! "${obj4[@]}" =~ $ptn ]]; then
-      delmail=("$obj4")
+      delmail+=("$obj4")
   else
-   unset obj4
+   :
   fi
  done
 
@@ -84,10 +84,10 @@ else
  done
 
  #edit ezmlm
- /usr/local/bin/ezmlm/ezmlm-list /var/qmail/ezmlm/test-ml > /backup/$datedir/dooga-ml.$date.$var3
- /usr/local/bin/ezmlm/ezmlm-unsub /var/qmail/ezmlm/test-ml $var2
- /usr/local/bin/ezmlm/ezmlm-list /var/qmail/ezmlm/test-ml > /backup/$datedir/dooga-ml.$date.$var3
- echo "diff /backup/$datedir/test-ml.$date.$var3 /backup/$datedir/dooga-ml.$date.$var3"
- diff_mlrst=`diff /backup/$datedir/test-ml.$date.$var3 /backup/$datedir/dooga-ml.$date.$var3`
+ /usr/local/bin/ezmlm/ezmlm-list /var/qmail/ezmlm/dooga-ml > /backup/$datedir/dooga-ml.$date.$var3
+ /usr/local/bin/ezmlm/ezmlm-unsub /var/qmail/ezmlm/dooga-ml $var2
+ /usr/local/bin/ezmlm/ezmlm-list /var/qmail/ezmlm/dooga-ml > /backup/$datedir/dooga-ml.$date.$var3
+ echo "diff /backup/$datedir/dooga-ml.$date.$var3 /backup/$datedir/dooga-ml.$date.$var3"
+ diff_mlrst=`diff /backup/$datedir/dooga-ml.$date.$var3 /backup/$datedir/dooga-ml.$date.$var3`
  echo $diff_mlrst
 fi
