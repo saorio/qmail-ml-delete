@@ -8,14 +8,17 @@ echo -n "(separated by a space or tab): "
 read var1
 
 #gateway information
-USER=vagrant
-GATEWAY=192.168.22.70
+USER=
+GATEWAY=
 
 #variable check
 if [ "${var1}" = "" ]; then
  echo "empty variable"
  exit
 else
+ /usr/sbin/useradd $var1
+ account =`id $var1`
+ echo $account
 
 ###GW
 #password
@@ -26,8 +29,8 @@ else
 
 ###DB GW
 #Add user
- PW="vagrant"
- SUPW="vagrant"
+#PW=
+#SUPW=
  expect -c "
  set timeout 5
  spawn env LANG=C /usr/bin/ssh $USER@$GATEWAY
@@ -36,7 +39,7 @@ else
  expect \"$\"
  send \"su -\n\"
  expect \"password:\"
- send \"${PW}\n\"
+ send \"${SUPW}\n\"
  send \"/usr/sbin/useradd $var1\n\"
  send \"id $var1\n\"
  send \"passwd $var1\n\"
