@@ -28,7 +28,7 @@ fi
 ###delete ML
 
 #array
-#mailad=(`find /var/qmail/alias/ -type f -name ".qmail*" | xargs grep ${var2}`)
+mailad=(`find /var/qmail/alias/ -type f -name ".qmail*" | xargs grep ${var2}`)
 disp_mailad=`find /var/qmail/alias/ -type f -name ".qmail*" | xargs grep ${var2}`
 if [ "${disp_mailad}" = "" ]; then
  echo "mail address does't exist. exit"
@@ -40,33 +40,34 @@ else
  printf "%s$homedir\n"
  printf "%s ---------------------------------\n"
  printf "%s------------mailing list----------\n"
- printf "%s$disp_mailad\n"
+ printf "%s$disp_mailad"\n
  printf "%s----------------------------------\n"
 
  #sanitize1 delete name@mailaddress
  for obj in "${mailad[@]}"; do
   obj2=(`printf "$obj" | sed -e "s/:.*//"`)
-   obj3+=("$obj2")
+   obj3=("${obj3[@]}" $obj2)
  done
+# printf "${obj3[@]}"
 
  #sanitize2 delete old copy MLfile
  ptn='([0-9]{8})'
  for obj4 in "${obj3[@]}"; do
   if [[ ! "${obj4[@]}" =~ $ptn ]]; then
-      delmail+=("$obj4")
+      delmail=("${delmail[@]}" "${obj4[@]}")
   else
    :
   fi
  done
 
  printf "%s------------delete list--------\n"
- echo -e ${delmail[@]}
+ echo   "${delmail[@]}"
  printf "%s--------------------------------\n"
 
  #sanitize3
  for mlfile in "${delmail[@]}"; do
   mlfile_stz=($(printf ""$mlfile | sed -e "s/^\/var\/qmail\/alias\///"))
-  mlfile_lst=("$mlfile_stz")
+  mlfile_lst=("${mlfile_lst[@]}" "${mlfile_stz[@]}")
  done
 
  #copy-ml-file
